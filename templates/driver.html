@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% block header %}
+    {% include 'header.html' %}
+{% endblock %}}
+
+{% block body %}
+
+    {% if not error %}
+    <div class="row">
+        <h4 class="center-align" style="font-weight: 300">Driver App - Driver id {{ driver_id }}</h4>
+    <div class="col s12 center-align">
+    <a href="{{ refresh_url }}" class="waves-effect waves-light btn center-align"><i class="material-icons right">refresh</i>Refresh</a>
+    </div>
+        <div class="col s12 ">
+            <ul class="tabs tab-demo z-depth-1">
+                <li class="tab col s4 ">
+                    <a class="red-text active" href="#Waiting">Waiting Requests</a></li>
+                <li class="tab col s4 ">
+                    <a class="red-text " href="#Ongoing">Ongoing Requests</a></li>
+                <li class="tab col s4 ">
+                    <a class="red-text " href="#Completed">Completed Requests</a></li>
+                <div class="indicator red accent-2" style="z-index:1"></div>
+            </ul>
+        </div>
+
+        <div class="container">
+            <div id ="Waiting" class="col s12 m8 offset-m2" style="margin-top: 20px;">
+                {% for ride in Waiting %}
+                    <div class="card hoverable">
+                        <div class="card-content">
+                            <span class="card-title grey-text text-darken-4 ">Req. Id: {{ ride.req_id }} | Cust. Id: {{ ride.customer_id }}</span>
+                            <p class="center-align"><strong>{{ ride.time_elapsed }} mins ago </strong></p>
+                        </div>
+                        <div class="card-action" style="margin-top: -10px;">
+                            <form id="pick-req" action="{% url 'pick_req' %}" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="req_id" value="{{ ride.req_id}}">
+                                <input type="hidden" name="driver_id" value="{{ driver_id }}">
+                                <button class="btn waves-effect waves-light" type="submit" style="float: right;margin-top:-15px;margin-bottom: 5px;margin-right: 10px;">Select
+                                    <i class="material-icons right">send</i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                {% empty %}
+                    <h2 class="center-align" style="font-weight: 200">Sorry, no Rides available.</h2>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="container">
+            <div id ="Ongoing" class="col s12 m8 offset-m2" style="margin-top: 20px;">
+                {% for ride in Ongoing %}
+                    <div class="card hoverable">
+                        <div class="card-content">
+                            <span class="card-title grey-text text-darken-4">Req. Id: {{ ride.req_id }} | Cust. Id: {{ ride.customer_id }}</span>
+                            <p class="center-align"><strong>Request : {{ ride.requested }} mins ago </strong></p>
+                            <p class="center-align"><strong>PickedUp : {{ ride.pickedup }} mins ago </strong></p>
+                        </div>
+                    </div>
+                {% empty %}
+                    <h2 class="center-align" style="font-weight: 250">Sorry, no Ongoing Rides</h2>
+                {% endfor %}
+            </div>
+        </div>
+
+
+        <div class="container">
+            <div id ="Completed" class="col s12 m8 offset-m2" style="margin-top: 20px;">
+                {% for ride in Complete %}
+                    <div class="card hoverable">
+                        <div class="card-content">
+                            <span class="card-title grey-text text-darken-4">Req. Id: {{ ride.req_id }} | Cust. Id: {{ ride.customer_id }}</span>
+                            <p class="center-align"><strong>Request : {{ ride.requested }} mins ago </strong></p>
+                            <p class="center-align"><strong>PickedUp : {{ ride.pickedup }} mins ago </strong></p>
+                            <p class="center-align"><strong>Complete: {{ ride.completed }} mins ago </strong></p>
+                        </div>
+                    </div>
+                {% empty %}
+                    <h2 class="center-align" style="font-weight: 250">Sorry, no Completed Rides</h2>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+        <script type="text/JavaScript">
+            $(document).on("submit", "#pick-req", function(e) {
+                e.preventDefault();
+                var frm = $(this).closest('form');
+                $.ajax({
+                    type : frm.attr('method'),
+                    url : frm.attr('action'),
+                    data: frm.serialize(),
+                    dataType: 'json',
+                    success: function (data) {
+                        console.log("success");
+                        if (data.status == 'success') {
+                            Materialize.toast('Success : Pickup Request Accepted', 3000);
+                        }
+                        if (data.status == 'error1') {
+                            Materialize.toast('Error : You already have an Ongoing Ride', 3000);
+                        }
+                        if (data.status == 'error2') {
+                            Materialize.toast('Error : Request No Longer Available', 3000);
+                        }
+                    }
+                });
+            });
+        </script>
+    {% else %}
+        <div class="row" style="margin-top: 100px">
+        <h4 class="center-align" style="font-weight: 300">{{ error }}</h4>
+        </div>
+    {% endif %}
+
+
+{% endblock body %}

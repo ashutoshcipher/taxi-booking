@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block header %}
+    {% include 'header.html' %}
+{% endblock %}}
+
+{% block body %}
+    <div class="row">
+        <h4 class="center-align" style="font-weight: 300; margin-top: 0px;">Dashboard</h4>
+    <div class="col s12 center-align">
+    <a href="/dashboard" class="waves-effect waves-light btn center-align"><i class="material-icons right">refresh</i>Refresh</a>
+    </div>
+    <div class="container">
+        <div class="col s12 m12" style="margin-top: 0px;">
+            <table class="striped bordered centered ">
+                <thead>
+                    <tr>
+                        <th>Request Id</th>
+                        <th>Customer Id</th>
+                        <th>Time Elapsed</th>
+                        <th>Status</th>
+                        <th>Driver</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for req in reqs %}
+                        <tr>
+                            <td>{{ req.req_id }}</td>
+                            <td>{{ req.customer_id }}</td>
+                            <td>{{ req.time_elapsed }}</td>
+                            <td>{{ req.status }}</td>
+                            <td>{{ req.driver_id }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+      </div>
+
+    </div>
+{% endblock body %}
