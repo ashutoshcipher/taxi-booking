@@ -11,7 +11,9 @@ from django.utils import timezone
 # Create your views here.
 
 def home(request):
+    #testststs
     return render(request, "index.html")
+
 
 
 def driver_view(request,id):
